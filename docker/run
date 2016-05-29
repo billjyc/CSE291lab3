@@ -30,12 +30,11 @@ docker exec -i ht-master ssh-copy-id -i /root/.ssh/id_rsa.pub root@ht-client3
 docker exec -i ht-master ssh-copy-id -i /root/.ssh/id_rsa.pub root@ht-client4
 docker exec -i ht-master /usr/local/hadoop/sbin/start-dfs.sh
 docker exec -i ht-master /usr/local/hadoop/sbin/start-yarn.sh
+
+docker exec -i ht-master bin/hdfs dfsadmin -safemode leave
+
 docker exec -i ht-master /usr/local/hadoop/bin/hadoop com.sun.tools.javac.Main WordCount.java
 docker exec -i ht-master /usr/local/hadoop/bin/hdfs dfs -put /usr/local/hadoop/cnn_news.txt input
 
 docker exec -i ht-master /bin/bash -c "jar cf wc.jar WordCount*.class"
-docker exec -i ht-master bin/hadoop jar wc.jar WordCount input/cnn_news.txt output
-
-docker exec -i ht-master bin/hdfs dfs -get output/part-r-00000 part-r-0000
-docker exec -i ht-master javac Combiner.java
-docker exec -i ht-master java Combiner part-r-0000
+docker exec -i ht-master bin/hadoop jar wc.jar WordCount input output
