@@ -47,21 +47,43 @@ public class Combiner {
             }
         }
         Map<String, Integer> newMap = sortMap(map);
-        File fout = new File("out.txt");
-        try {
-            FileOutputStream fos = new FileOutputStream(fout);
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-
-            for(Map.Entry<String, Integer> entry: newMap.entrySet()) {
-                bw.write(entry.getKey() + "\t" + entry.getValue());
-                bw.newLine();
-            }
-            bw.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        int total = 0;
+        for(Map.Entry<String, Integer> entry: newMap.entrySet()) {
+            total += entry.getValue();
         }
+
+        System.out.println("The total number of bigrams: " + newMap.size());
+        for(Map.Entry<String, Integer> entry: newMap.entrySet()) {
+            System.out.println("The most common bigram: " + entry.getKey() + "\t" + entry.getValue());
+            break;
+        }
+
+        int subtotal = 0;
+        int num = 0;
+        for(Map.Entry<String, Integer> entry: newMap.entrySet()) {
+            if(entry.getValue() + subtotal > total / 10) {
+                break;
+            }
+            subtotal += entry.getValue();
+            num++;
+        }
+
+        System.out.println("The number of bigrams required to add up to 10% of all bigrams: " + num);
+//        File fout = new File("out.txt");
+//        try {
+//            FileOutputStream fos = new FileOutputStream(fout);
+//            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+//
+//            for(Map.Entry<String, Integer> entry: newMap.entrySet()) {
+//                bw.write(entry.getKey() + "\t" + entry.getValue());
+//                bw.newLine();
+//            }
+//            bw.close();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public static Map sortMap(Map oldMap) {
@@ -73,7 +95,7 @@ public class Combiner {
             }
         });
         Map newMap = new LinkedHashMap<>();
-        for(int i = 0; i < list.size() / 10; i++) {
+        for(int i = 0; i < list.size(); i++) {
             newMap.put(list.get(i).getKey(), list.get(i).getValue());
         }
         return newMap;
