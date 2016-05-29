@@ -68,7 +68,7 @@ public class WordCount {
         job.setReducerClass(WordCount.IntSumReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
-        job.setNumReduceTasks(4);
+        // job.setNumReduceTasks(4);
         for (int i = 0; i < otherArgs.length - 1; ++i) {
             org.apache.hadoop.mapreduce.lib.input.FileInputFormat.addInputPath(job, new Path(otherArgs[i]));
         }

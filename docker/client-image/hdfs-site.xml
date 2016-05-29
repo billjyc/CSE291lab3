@@ -1,0 +1,6 @@
+<configuration>
+    <property>
+        <name>dfs.replication</name>
+        <value>4</value>
+    </property>
+</configuration>
