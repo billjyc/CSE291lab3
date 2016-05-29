@@ -9,7 +9,7 @@ import org.apache.hadoop.util.GenericOptionsParser;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * Created by billjyc on 5/27/16.
@@ -110,6 +110,21 @@ public class WordCount {
         }
     }
 
+    public static Map sortMap(Map oldMap) {
+        List<Map.Entry<String, Integer>> list = new ArrayList<>(oldMap.entrySet());
+        Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+            @Override
+            public int compare(Map.Entry<String, Integer> t0, Map.Entry<String, Integer> t1) {
+                return t1.getValue() - t0.getValue();
+            }
+        });
+        Map newMap = new LinkedHashMap<>();
+        for(int i = 0; i < list.size(); i++) {
+            newMap.put(list.get(i).getKey(), list.get(i).getValue());
+        }
+        return newMap;
+    }
+
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
@@ -147,20 +162,52 @@ public class WordCount {
             job2.waitForCompletion(true);
         }
 
-//        Path path = new Path("output/part-r-00000");
-//        FileSystem fs = FileSystem.get(new Configuration());
-//        try {
-//            BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(path)));
-//            String line;
-//            line = br.readLine();
-//            String[] strs = line.split("\\s");
-//            System.out.println("The most frequent bigram: " + strs[1] + "\t" + strs[0]);
-//            while(line != null) {
-//                line = br.readLine();
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        Path[] paths = new Path[4];
+        paths[0] = new Path("hdfs://ht-master:9000/user/root/output/part-r-00000");
+        paths[1] = new Path("hdfs://ht-master:9000/user/root/output/part-r-00001");
+        paths[2] = new Path("hdfs://ht-master:9000/user/root/output/part-r-00002");
+        paths[3] = new Path("hdfs://ht-master:9000/user/root/output/part-r-00003");
+
+        FileSystem fs = FileSystem.get(new Configuration());
+        Map<String, Integer> map = new LinkedHashMap<>();
+        int totalSize = 0;
+        try {
+            for(int i = 0; i < paths.length; i++) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(paths[i])));
+                String line;
+                line = br.readLine();
+                String[] strs;
+
+                while(line != null) {
+                    strs = line.split("\\s");
+                    totalSize += Integer.parseInt(strs[0]);
+                    map.put(strs[1], Integer.parseInt(strs[0]));
+                    line = br.readLine();
+                }
+            }
+
+            map = sortMap(map);
+
+            System.out.println("The total number of bigrams: " + map.size());
+
+            int subTotal = 0;
+            int num = 0;
+            for(Map.Entry<String, Integer> entry : map.entrySet()) {
+                subTotal += entry.getValue();
+                num++;
+                if(num == 1) {
+                    System.out.println("The most common bigram: " + entry.getKey());
+                }
+
+                if(subTotal > totalSize / 10) {
+                    System.out.println("The number of bigrams required to add up to 10% of all bigrams: " + num);
+                    break;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 }
