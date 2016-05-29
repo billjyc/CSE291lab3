@@ -1,0 +1,13 @@
+docker stop ht-master
+docker stop ht-client1
+docker stop ht-client2
+docker stop ht-client3
+docker stop ht-client4
+docker rm ht-master
+docker rm ht-client1
+docker rm ht-client2
+docker rm ht-client3
+docker rm ht-client4
+docker rmi codecancer/hadoop-client
+docker rmi codecancer/hadoop-master
+docker network rm test-hadoop

@@ -1,0 +1,32 @@
+docker network create -d bridge test-hadoop
+
+docker build -t codecancer/hadoop-client ./client-image
+docker build -t codecancer/hadoop-master ./master-image
+
+docker run -itd --name=ht-client1 --net=test-hadoop codecancer/hadoop-client  /etc/bootstrap.sh -bash
+docker exec -i ht-client1 rm /usr/local/hadoop/etc/hadoop/core-site.xml
+docker cp ./client-image/core-site.xml ht-client1:/usr/local/hadoop/etc/hadoop/
+
+docker run -itd --name=ht-client2 --net=test-hadoop codecancer/hadoop-client  /etc/bootstrap.sh -bash
+docker exec -i ht-client2 rm /usr/local/hadoop/etc/hadoop/core-site.xml
+docker cp ./client-image/core-site.xml ht-client2:/usr/local/hadoop/etc/hadoop/
+
+docker run -itd --name=ht-client3 --net=test-hadoop codecancer/hadoop-client  /etc/bootstrap.sh -bash
+docker exec -i ht-client3 rm /usr/local/hadoop/etc/hadoop/core-site.xml
+docker cp ./client-image/core-site.xml ht-client3:/usr/local/hadoop/etc/hadoop/
+
+docker run -itd --name=ht-client4 --net=test-hadoop codecancer/hadoop-client  /etc/bootstrap.sh -bash
+docker exec -i ht-client4 rm /usr/local/hadoop/etc/hadoop/core-site.xml
+docker cp ./client-image/core-site.xml ht-client4:/usr/local/hadoop/etc/hadoop/
+
+
+docker run -itd --name=ht-master --net=test-hadoop codecancer/hadoop-master /etc/bootstrap.sh -bash
+docker exec -i ht-master rm /usr/local/hadoop/etc/hadoop/core-site.xml
+docker cp ./client-image/core-site.xml ht-master:/usr/local/hadoop/etc/hadoop/
+
+docker exec -i ht-master ssh-copy-id -i /root/.ssh/id_rsa.pub root@ht-client1
+docker exec -i ht-master ssh-copy-id -i /root/.ssh/id_rsa.pub root@ht-client2
+docker exec -i ht-master ssh-copy-id -i /root/.ssh/id_rsa.pub root@ht-client3
+docker exec -i ht-master ssh-copy-id -i /root/.ssh/id_rsa.pub root@ht-client4
+
+# docker run -itd --name=ht-master --net=test-hadoop codecancer/hadoop-master /bin/bash -c "/etc/bootstrap.sh -bash; cd /usr/local/hadoop; ./sbin/stop-dfs.sh; ./sbin/stop-yarn.sh; ssh-copy-id -i $HOME/.ssh/id_rsa.pub root@ht-client1; ssh-copy-id -i $HOME/.ssh/id_rsa.pub root@ht-client2; ssh-copy-id -i $HOME/.ssh/id_rsa.pub root@ht-client3; ssh-copy-id -i $HOME/.ssh/id_rsa.pub root@ht-client4; ./sbin/start-dfs.sh; ./sbin/start-yarn.sh;"
