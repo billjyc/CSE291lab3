@@ -156,7 +156,10 @@ public class WordCount {
             job2.setOutputKeyClass(IntWritable.class);
             job2.setOutputValueClass(Text.class);
             job2.setNumReduceTasks(4);
-            org.apache.hadoop.mapreduce.lib.input.FileInputFormat.addInputPath(job2, new Path("temp/"));
+            org.apache.hadoop.mapreduce.lib.input.FileInputFormat.addInputPath(job2, new Path("temp/part-r-00000"));
+            org.apache.hadoop.mapreduce.lib.input.FileInputFormat.addInputPath(job2, new Path("temp/part-r-00001"));
+            org.apache.hadoop.mapreduce.lib.input.FileInputFormat.addInputPath(job2, new Path("temp/part-r-00002"));
+            org.apache.hadoop.mapreduce.lib.input.FileInputFormat.addInputPath(job2, new Path("temp/part-r-00003"));
             org.apache.hadoop.mapreduce.lib.output.FileOutputFormat.setOutputPath(job2,
                     new Path(otherArgs[otherArgs.length - 1]));
             job2.waitForCompletion(true);

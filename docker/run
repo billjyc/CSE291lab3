@@ -37,4 +37,4 @@ docker exec -i ht-master /usr/local/hadoop/bin/hadoop com.sun.tools.javac.Main W
 docker exec -i ht-master /usr/local/hadoop/bin/hdfs dfs -put /usr/local/hadoop/cnn_news.txt input
 
 docker exec -i ht-master /bin/bash -c "jar cf wc.jar WordCount*.class"
-docker exec -i ht-master bin/hadoop jar wc.jar WordCount input output
+docker exec -i ht-master bin/hadoop jar wc.jar WordCount input/cnn_news.txt output
